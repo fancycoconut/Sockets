@@ -34,7 +34,7 @@ namespace Sockets.Core.Http
             await client.ConnectAsync(uri.Host, uri.Port);
 
             var stream = client.GetStream();
-            if (uri.Scheme == "http") return stream;
+            if (uri.Scheme == Uri.UriSchemeHttp) return stream;
 
             return await httpsHandler.GetSslStream(stream, uri);
         }

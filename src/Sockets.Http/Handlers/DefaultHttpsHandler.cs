@@ -10,8 +10,9 @@ namespace Sockets.Http.Handlers
     {
         public async Task<SslStream> GetSslStream(NetworkStream stream, Uri uri)
         {
-            var ssl = new SslStream(stream, false, ValidateServerCertificate, null);
+            var ssl = new SslStream(stream, false, new RemoteCertificateValidationCallback(ValidateServerCertificate), null);
             await ssl.AuthenticateAsClientAsync(uri.Host);
+
             return ssl;
         }
 

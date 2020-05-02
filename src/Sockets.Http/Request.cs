@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,10 +11,9 @@ namespace Sockets.Core.Http
     public class Request
     {
         public Uri Uri { get; set; }
-        public Dictionary<string, string> Headers => headers;
+        public Dictionary<string, string> Headers { get; }
 
         private readonly Method method;
-        private readonly Dictionary<string, string> headers;
 
         public Request(string method) : this(new Method(method))
         {
@@ -22,16 +22,16 @@ namespace Sockets.Core.Http
         public Request(Method method)
         {
             this.method = method;
-            headers = new Dictionary<string, string>();
+            Headers = new Dictionary<string, string>();
         }
 
-        public virtual async Task<string> SendRequest(Stream stream)
+        public virtual async Task<string> SendRequest(Stream connection)
         {
             using (var ms = new MemoryStream())
             {
-                using (var reader = new StreamReader(stream))
+                using (var reader = new StreamReader(connection))
                 {
-                    var requestHeaders = Encoding.UTF8.GetBytes(BuildRequestHeader());
+                    var requestHeaders = Encoding.ASCII.GetBytes(BuildRequestHeader());
                     await ms.WriteAsync(requestHeaders, 0, requestHeaders.Length);
 
                     if (method.HasRequestBody())
@@ -39,18 +39,18 @@ namespace Sockets.Core.Http
 
                     }
 
-                    //if (!stream.CanWrite) 
-                    //    throw new InvalidOperationException("The remote network connection has been closed therefore the request cannot be sent.");
-                    //var buffer = ms.ToArray();
-                    await ms.CopyToAsync(stream);
+                    if (!connection.CanWrite)
+                        throw new InvalidOperationException("The remote network connection has been closed therefore the request cannot be sent.");
 
-                    //if (!stream.CanRead)
-                    //    throw new InvalidOperationException("The remote network connection has been closed therefore the response cannot be received.");
+                    var buffer = ms.ToArray();
+                    await connection.WriteAsync(buffer, 0, buffer.Length);
 
-                    var result = await reader.ReadToEndAsync();
-                    return result;
-                }                
-            }
+                    if (!connection.CanRead)
+                        throw new InvalidOperationException("The remote network connection has been closed therefore the response cannot be received.");
+
+                    return await reader.ReadToEndAsync();
+                }              
+            }            
         }
 
         public void ClearHeaders()
@@ -61,7 +61,7 @@ namespace Sockets.Core.Http
         public void SetHeader(string name, string value)
         {
             // TODO Add validation
-            headers.AddOrUpdate(name, value);
+            Headers.AddOrUpdate(name, value);
         }
 
         public string BuildRequestHeader()
@@ -69,7 +69,7 @@ namespace Sockets.Core.Http
             var sb = new StringBuilder();
             sb.Append($"{method} {Uri.AbsoluteUri} {GetProtocol()}{Environment.NewLine}");
 
-            foreach (var header in headers)
+            foreach (var header in Headers)
             {
                 sb.Append($"{header.Key}: {header.Value}{Environment.NewLine}");
             }
