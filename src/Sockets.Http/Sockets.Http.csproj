@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Exceptions\" />
+    <ProjectReference Include="..\Sockets.Core\Sockets.Core.csproj" />
   </ItemGroup>
 
 </Project>
