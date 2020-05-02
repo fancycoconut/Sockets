@@ -55,7 +55,7 @@ namespace Sockets.Core.Http
 
         public void ClearHeaders()
         {
-            headers.Clear();
+            Headers.Clear();
         }
 
         public void SetHeader(string name, string value)
