@@ -1,6 +1,6 @@
 ﻿using Sockets.Core.Extensions;
-using Sockets.Core.Http;
-using Sockets.Http.Helpers;
+using Sockets.Http.Content;
+using Sockets.Http.Factories;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -9,25 +9,24 @@ namespace Sockets.Http.Parser
 {
     public class HttpResponseParser
     {
-        public string Status { get; set; }
+        public string ProtocolVersion { get; private set; }
+        public string Status { get; private set; }
         public HttpStatusCode StatusCode { get; private set; }
         public Dictionary<string, string> Headers { get; }
         public Dictionary<string, HttpCookie> Cookies { get; }
-
-        private readonly string response;
+        public IHttpContent Content { get; private set; }
 
         public HttpResponseParser(string response)
         {
             Headers = new Dictionary<string, string>();
             Cookies = new Dictionary<string, HttpCookie>();
-            this.response = response;
 
             Parse(response);
         }
 
         private void Parse(string response)
         {
-            var sections = Regex.Split(response, "\r\n\r\n");
+            var sections = Regex.Split(response, $"{Constants.CRLF}{Constants.CRLF}");
             if (sections.Length == 0) return;
 
             ParseResponseHeaders(sections[0]);
@@ -36,33 +35,42 @@ namespace Sockets.Http.Parser
             ParseResponseBody(sections[1]);
         }
 
-        private void ParseResponseHeaders(string headerSection)
+        private void ParseResponseHeaders(string rawHeaders)
         {
-            var lines = Regex.Split(headerSection, "\r\n");
-            var responseResult = lines[0].Split(' ');
-            
-            StatusCode = (HttpStatusCode)Convert.ToInt32(responseResult[1]);
-            Status = responseResult[2];
+            var lines = Regex.Split(rawHeaders, Constants.CRLF);
+            SetResponseStatus(lines[0]);
 
             for (var i = 1; i < lines.Length; i++)
             {
                 var headerValuePair = Regex.Split(lines[i], ": ");
 
-                // Parse cookies...
-                if (headerValuePair[0] == "Set-Cookie")
-                {
-                    var cookie = new HttpCookie(headerValuePair[1]);
-                    Cookies.AddOrUpdate(cookie.Name, cookie);
-                    continue;
-                }
-
+                if (CheckAndSetCookie(headerValuePair)) continue;
                 Headers.AddOrUpdate(headerValuePair[0], headerValuePair[1]);
             }
         }
 
-        private void ParseResponseBody(string bodySection)
+        private void SetResponseStatus(string responseResult)
         {
-            var body = Regex.Split(bodySection, "\r\n");
+            var parts = responseResult.Split(' ');
+
+            ProtocolVersion = parts[0];
+            StatusCode = (HttpStatusCode)Convert.ToInt32(parts[1]);
+            Status = parts[2];
+        }
+
+        private bool CheckAndSetCookie(string[] keyValuePair)
+        {
+            if (keyValuePair[0] != "Set-Cookie") return false;
+
+            var cookie = new HttpCookie(keyValuePair[1]);
+            Cookies.AddOrUpdate(cookie.Name, cookie);
+            return true;
+        }
+
+        private void ParseResponseBody(string rawBody)
+        {
+            var factory = new HttpContentFactory();
+            Content = factory.Resolve(Headers, rawBody);
         }
     }
 }

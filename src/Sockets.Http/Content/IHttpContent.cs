@@ -1,4 +1,4 @@
-﻿namespace Sockets.Http
+﻿namespace Sockets.Http.Content
 {
     public interface IHttpContent
     {

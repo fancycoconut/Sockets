@@ -19,7 +19,7 @@ namespace Sockets.Core.Extensions
         public static TValue GetValue<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
         {
             var exists = dictionary.TryGetValue(key, out TValue value);
-            return exists ? value : default(TValue);
+            return exists ? value : default;
         }
     }
 }

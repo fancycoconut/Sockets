@@ -6,6 +6,7 @@ namespace Sockets.Core.Http
 {
     public class HttpResponse
     {
+        public string ProtocolVersion { get; private set; }
         public string Status { get; private set; }
         public HttpStatusCode StatusCode { get; private set; }
         public Dictionary<string, string> Headers { get; private set; }
@@ -24,10 +25,11 @@ namespace Sockets.Core.Http
             
             return new HttpResponse(responseText)
             {
+                ProtocolVersion = result.ProtocolVersion,
+                Status = result.Status,
+                StatusCode = result.StatusCode,
                 Headers = result.Headers,
                 Cookies = result.Cookies,
-                Status = result.Status,
-                StatusCode = result.StatusCode
             };
         }
 
