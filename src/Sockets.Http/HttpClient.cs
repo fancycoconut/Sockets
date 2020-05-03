@@ -19,6 +19,18 @@ namespace Sockets.Core.Http
             httpsHandler = new DefaultHttpsHandler();
         }
 
+        public Task<HttpResponse> Get(string url)
+        {
+            var request = new HttpRequest(HttpMethod.Get)
+            {
+                Uri = new Uri(url)
+            };
+
+            request.SetHeader("Connection", "close");
+
+            return Send(request);
+        }
+
         public async Task<HttpResponse> Send(HttpRequest request)
         {
             using (var stream = await OpenConnection(request.Uri))

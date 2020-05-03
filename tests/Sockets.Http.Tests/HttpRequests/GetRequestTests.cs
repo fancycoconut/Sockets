@@ -26,13 +26,20 @@ namespace Sockets.Http.Tests.HttpRequests
             };
 
             request.SetHeader("Accept", "*/*");
-            request.SetHeader("Accept-Encoding", "gzip, deflate, br");
-            request.SetHeader("Cache-Control", "no-cache");
-            request.SetHeader("User-Agent", "TestClient");
             request.SetHeader("Connection", "close");
 
             // Act
             var response = await client.Send(request);
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.Ok, response.StatusCode);
+        }
+
+        [TestMethod]
+        public async Task Get_BasicGet()
+        {
+            // Arrange & Act
+            var response = await client.Get("https://www.google.co.nz/");
 
             // Assert
             Assert.AreEqual(HttpStatusCode.Ok, response.StatusCode);
