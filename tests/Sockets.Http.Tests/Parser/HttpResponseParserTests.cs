@@ -1,6 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualBasic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sockets.Http.Parser;
 using Sockets.Http.Tests.Helpers;
+using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Sockets.Http.Tests.Parser
@@ -15,11 +18,10 @@ namespace Sockets.Http.Tests.Parser
             var responseText = await ResourceHelper.GetResponse("SampleHeadResponse");
 
             // Act
-            var parser = new HttpResponseParser(responseText);
+            var result = new HttpResponseParser(responseText);
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.Ok, parser.StatusCode);
-            Assert.AreEqual(12, parser.Headers.Count);
+            Assert.AreEqual(HttpStatusCode.Ok, result.StatusCode);
         }
     }
 }

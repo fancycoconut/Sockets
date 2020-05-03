@@ -1,6 +1,5 @@
 ﻿using Sockets.Core.Http;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Sockets.Example

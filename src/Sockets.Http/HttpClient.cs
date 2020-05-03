@@ -36,7 +36,7 @@ namespace Sockets.Core.Http
             using (var stream = await OpenConnection(request.Uri))
             {
                 var response = await request.SendRequest(stream);
-                return new HttpResponse(response);
+                return HttpResponse.Create(response);
             }
         }
 

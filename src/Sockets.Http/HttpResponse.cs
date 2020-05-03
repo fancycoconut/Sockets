@@ -6,18 +6,29 @@ namespace Sockets.Core.Http
 {
     public class HttpResponse
     {
-        public HttpStatusCode StatusCode { get; set; }
-        public Dictionary<string, string> Headers { get; }
+        public string Status { get; private set; }
+        public HttpStatusCode StatusCode { get; private set; }
+        public Dictionary<string, string> Headers { get; private set; }
+        public Dictionary<string, HttpCookie> Cookies { get; private set; }
 
         private readonly string httpResponse;
 
-        public HttpResponse(string response)
+        private HttpResponse(string response)
         {
             httpResponse = response;
+        }
 
-            var parser = new HttpResponseParser(httpResponse);
-            Headers = parser.Headers;
-            StatusCode = parser.StatusCode;
+        public static HttpResponse Create(string responseText)
+        {
+            var result = new HttpResponseParser(responseText);
+            
+            return new HttpResponse(responseText)
+            {
+                Headers = result.Headers,
+                Cookies = result.Cookies,
+                Status = result.Status,
+                StatusCode = result.StatusCode
+            };
         }
 
         public bool IsSuccessCode

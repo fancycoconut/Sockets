@@ -1,4 +1,5 @@
 ﻿using Sockets.Core.Extensions;
+using Sockets.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,15 +68,15 @@ namespace Sockets.Core.Http
         public string BuildRequestHeader()
         {
             var sb = new StringBuilder();
-            sb.Append($"{method} {Uri.AbsoluteUri} {GetProtocol()}{Environment.NewLine}");
+            sb.Append($"{method} {Uri.AbsoluteUri} {GetProtocol()}{Constants.CRLF}");
 
             foreach (var header in Headers)
             {
-                sb.Append($"{header.Key}: {header.Value}{Environment.NewLine}");
+                sb.Append($"{header.Key}: {header.Value}{Constants.CRLF}");
             }
 
-            sb.Append($"Host: { GetHostHeaderValue() }{Environment.NewLine}");
-            sb.Append(Environment.NewLine);
+            sb.Append($"Host: { GetHostHeaderValue() }{Constants.CRLF}");
+            sb.Append(Constants.CRLF);
             return sb.ToString();
         }
 
