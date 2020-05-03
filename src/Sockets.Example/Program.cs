@@ -1,6 +1,6 @@
 ﻿using Sockets.Core.Http;
 using System;
-using System.Runtime.InteropServices;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Sockets.Example
@@ -18,9 +18,9 @@ namespace Sockets.Example
 
         static async Task MainAsync(string[] args)
         {
-            using (var client = new Client())
+            using (var client = new HttpClient())
             {
-                var request = new Request(Method.Get)
+                var request = new HttpRequest(HttpMethod.Get)
                 {
                     Uri = new Uri("https://www.google.co.nz/")
                 };
@@ -36,6 +36,9 @@ namespace Sockets.Example
 
                 var response = await client.Send(request);
                 Console.WriteLine("My response:");
+                Console.WriteLine(response);
+
+                File.WriteAllText(@"C:\Users\Kawai\Desktop\SampleHeadResponse.txt", response.ToString());
             }
 
             Console.ReadLine();

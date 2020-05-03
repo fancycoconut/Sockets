@@ -19,4 +19,14 @@
     <ProjectReference Include="..\..\src\Sockets.Http\Sockets.Http.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\Responses\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Responses\SampleHeadResponse.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

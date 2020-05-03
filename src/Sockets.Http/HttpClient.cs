@@ -1,31 +1,30 @@
 ﻿using Sockets.Http.Handlers;
 using System;
 using System.IO;
-using System.Net.Security;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Sockets.Core.Http
 {
-    public class Client : IDisposable
+    public class HttpClient : IDisposable
     {
         private bool disposed = false;
         private readonly TcpClient client;
 
         private IHttpsHandler httpsHandler;
 
-        public Client()
+        public HttpClient()
         {
             client = new TcpClient();
             httpsHandler = new DefaultHttpsHandler();
         }
 
-        public async Task<Response> Send(Request request)
+        public async Task<HttpResponse> Send(HttpRequest request)
         {
             using (var stream = await OpenConnection(request.Uri))
             {
                 var response = await request.SendRequest(stream);
-                return new Response(response);
+                return new HttpResponse(response);
             }
         }
 

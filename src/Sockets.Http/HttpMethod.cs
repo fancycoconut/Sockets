@@ -2,21 +2,21 @@
 
 namespace Sockets.Core.Http
 {
-    public class Method
+    public class HttpMethod
     {
         // NOTE: Connect should not be exposed.. End users should not be able to use this.
-        public static Method Get => new Method("GET");
-        public static Method Head => new Method("HEAD");
-        public static Method Post => new Method("POST");
-        public static Method Put => new Method("PUT");
-        public static Method Delete => new Method("DELETE");
-        public static Method Options => new Method("OPTIONS");
-        public static Method Patch => new Method("PATCH");
+        public static HttpMethod Get => new HttpMethod("GET");
+        public static HttpMethod Head => new HttpMethod("HEAD");
+        public static HttpMethod Post => new HttpMethod("POST");
+        public static HttpMethod Put => new HttpMethod("PUT");
+        public static HttpMethod Delete => new HttpMethod("DELETE");
+        public static HttpMethod Options => new HttpMethod("OPTIONS");
+        public static HttpMethod Patch => new HttpMethod("PATCH");
 
         private readonly string method;
         private const string validMethods = "GET,HEAD,POST,PUT,DELETE,CONNECT,OPTIONS,TRACE,PATCH";
 
-        public Method(string method)
+        public HttpMethod(string method)
         {
             if (string.IsNullOrEmpty(method)) throw new ArgumentException("Http method cannot be null or empty");
 

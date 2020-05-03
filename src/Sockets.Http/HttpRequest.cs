@@ -2,24 +2,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Security;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Sockets.Core.Http
 {
-    public class Request
+    public class HttpRequest
     {
         public Uri Uri { get; set; }
         public Dictionary<string, string> Headers { get; }
 
-        private readonly Method method;
+        private readonly HttpMethod method;
 
-        public Request(string method) : this(new Method(method))
+        public HttpRequest(string method) : this(new HttpMethod(method))
         {
         }
 
-        public Request(Method method)
+        public HttpRequest(HttpMethod method)
         {
             this.method = method;
             Headers = new Dictionary<string, string>();
@@ -44,6 +43,7 @@ namespace Sockets.Core.Http
 
                     var buffer = ms.ToArray();
                     await connection.WriteAsync(buffer, 0, buffer.Length);
+                    await connection.FlushAsync();
 
                     if (!connection.CanRead)
                         throw new InvalidOperationException("The remote network connection has been closed therefore the response cannot be received.");
