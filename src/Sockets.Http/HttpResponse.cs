@@ -13,6 +13,7 @@ namespace Sockets.Core.Http
         public Dictionary<string, HttpCookie> Cookies { get; private set; }
 
         private readonly string httpResponse;
+        private string responseBody;
 
         private HttpResponse(string response)
         {

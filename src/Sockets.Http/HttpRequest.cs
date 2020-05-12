@@ -68,7 +68,7 @@ namespace Sockets.Core.Http
         public string BuildRequestHeader()
         {
             var sb = new StringBuilder();
-            sb.Append($"{method} {Uri.AbsoluteUri} {GetProtocol()}{Constants.CRLF}");
+            sb.Append($"{method} { Uri.PathAndQuery } {GetProtocol()}{Constants.CRLF}");
 
             foreach (var header in Headers)
             {

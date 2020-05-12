@@ -1,6 +1,4 @@
 ﻿using Sockets.Core.Extensions;
-using Sockets.Http.Content;
-using Sockets.Http.Factories;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -14,7 +12,7 @@ namespace Sockets.Http.Parser
         public HttpStatusCode StatusCode { get; private set; }
         public Dictionary<string, string> Headers { get; }
         public Dictionary<string, HttpCookie> Cookies { get; }
-        public IHttpContent Content { get; private set; }
+        public string ResponseBody { get; private set; }
 
         public HttpResponseParser(string response)
         {
@@ -32,7 +30,7 @@ namespace Sockets.Http.Parser
             ParseResponseHeaders(sections[0]);
 
             if (sections.Length == 1) return;
-            ParseResponseBody(sections[1]);
+            ResponseBody = sections[1];
         }
 
         private void ParseResponseHeaders(string rawHeaders)
@@ -65,12 +63,6 @@ namespace Sockets.Http.Parser
             var cookie = new HttpCookie(keyValuePair[1]);
             Cookies.AddOrUpdate(cookie.Name, cookie);
             return true;
-        }
-
-        private void ParseResponseBody(string rawBody)
-        {
-            var factory = new HttpContentFactory();
-            Content = factory.Resolve(Headers, rawBody);
         }
     }
 }

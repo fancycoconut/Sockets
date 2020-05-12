@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sockets.Coap\Sockets.Coap.csproj" />
     <ProjectReference Include="..\Sockets.Core\Sockets.Core.csproj" />
     <ProjectReference Include="..\Sockets.Http\Sockets.Http.csproj" />
   </ItemGroup>

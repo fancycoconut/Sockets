@@ -1,9 +1,6 @@
-﻿using Microsoft.VisualBasic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sockets.Http.Parser;
 using Sockets.Http.Tests.Helpers;
-using System;
-using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Sockets.Http.Tests.Parser

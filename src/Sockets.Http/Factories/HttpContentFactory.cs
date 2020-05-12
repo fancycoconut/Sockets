@@ -11,7 +11,14 @@ namespace Sockets.Http.Factories
             var contentType = headers.GetValue("Content-Type");
             var chunkedTransfer = headers.GetValue("Transfer-Encoding") == "chunked";
 
-            //if (content.IndexOf("text/html") > 0)
+            if (chunkedTransfer) return HandleChunkedContent(contentType, content);            
+
+            return new NullHttpContent();
+        }
+
+        private IHttpContent HandleChunkedContent(string contentType, string content)
+        {
+            if (content.IndexOf("text") > 0) return TextContent.FromChunkedText(content);
 
             return new NullHttpContent();
         }
