@@ -6,14 +6,14 @@ namespace Sockets.Coap.Serialisation
 {
     public class CoapWriter
     {
-        public byte[] Encode(CoapRequest request)
+        public byte[] Serialize(CoapRequest request)
         {
-            using (var ms = new MemoryStream())
+            using (var output = new MemoryStream())
             {
-                using (var writer = new EndianBinaryWriter(EndianBitConverter.Big, ms))
+                using (var writer = new EndianBinaryWriter(EndianBitConverter.Big, output))
                 {
                     var version = (request.ProtocolVersion & 0x3) << 30;
-                    var type = ((int)request.Type & 0x3) << 28;
+                    var type = ((int)request.MessageType & 0x3) << 28;
                     var tokenLength = (request.Token.Length & 0xF) << 24;
                     var messageCode = ((int)request.Method & 0xFF) << 16;
                     var messageId = request.Id & 0xFFFF;
@@ -28,7 +28,7 @@ namespace Sockets.Coap.Serialisation
                     // Payload
                 }
 
-                return ms.ToArray();
+                return output.ToArray();
             }
         }
     }

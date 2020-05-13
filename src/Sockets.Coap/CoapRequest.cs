@@ -4,25 +4,24 @@ namespace Sockets.Coap
 {
     public class CoapRequest
     {
-        public short Id { get; set; }
+        public int Id { get; set; }
         public int ProtocolVersion => 1;
-        public CoapMessageType Type { get; set; }
-        public MessageClass Class => MessageClass.Method;
+        public CoapMessageType MessageType { get; set; }
         public CoapMethod Method { get; set; }
 
         public byte[] Token { get; set; }
 
         public CoapRequest(CoapMethod method, CoapMessageType type)
         {
-            Type = type;
+            MessageType = type;
             Method = method;
             Token = new byte[] { };
         }
 
-        public byte[] Serialise()
+        public byte[] Serialize()
         {
             var writer = new CoapWriter();
-            return writer.Encode(this);
+            return writer.Serialize(this);
         }
     }
 }

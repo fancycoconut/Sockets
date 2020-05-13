@@ -1,6 +1,6 @@
 ﻿namespace Sockets.Coap
 {
-    public enum MessageClass
+    public enum CoapStatusClass
     {
         Method = 0,
         Success = 2,

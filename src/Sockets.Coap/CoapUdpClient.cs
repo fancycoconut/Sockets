@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sockets.Coap.Serialisation;
+using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -23,14 +24,16 @@ namespace Sockets.Coap
             client = new UdpClient(family);
         }
 
-        public async Task Send(Uri uri, byte[] message)
+        public async Task<CoapResponse> Send(Uri uri, byte[] message)
         {
             if (message.Length == 0) throw new ArgumentException("An empty CoAP message cannot be sent.");
 
             client.Connect(uri.Host, uri.Port);
             await client.SendAsync(message, message.Length);
 
-            var response = client.ReceiveAsync();
+            var response = await client.ReceiveAsync();
+            var reader = new CoapReader();
+            return reader.Deserialize(response.Buffer);
         }
 
         //public async Task Connect(Uri uri)

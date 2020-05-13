@@ -42,11 +42,11 @@ namespace Sockets.Example
             {
                 Id = 23
             };
-            var data = request.Serialise();
+            var data = request.Serialize();
             using (var client = new CoapUdpClient())
             {
                 var uri = new Uri("coap://localhost:5683/hello");
-                await client.Send(uri, data);
+                var response = await client.Send(uri, data);
             }
 
             Console.ReadLine();
