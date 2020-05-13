@@ -7,3 +7,6 @@ This is the bare bones library for making HTTP requests at socket level. I wrote
 Note: Please do not use this code in any production system because this is a barebone library.
 
 ### CoAP
+
+### Acknowledgements
+Jon Skeet - MiscUtil

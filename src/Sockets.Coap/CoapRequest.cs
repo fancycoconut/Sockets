@@ -7,6 +7,7 @@ namespace Sockets.Coap
         public short Id { get; set; }
         public int ProtocolVersion => 1;
         public CoapMessageType Type { get; set; }
+        public MessageClass Class => MessageClass.Method;
         public CoapMethod Method { get; set; }
 
         public byte[] Token { get; set; }

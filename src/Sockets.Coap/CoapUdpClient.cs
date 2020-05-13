@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -12,27 +11,43 @@ namespace Sockets.Coap
     {
         private bool disposed = false;
 
-        private Socket socket;
+        private UdpClient client;
 
         public CoapUdpClient()
         {
+            client = new UdpClient(AddressFamily.InterNetworkV6);
         }
 
-        public async Task Connect(Uri uri)
+        public CoapUdpClient(AddressFamily family)
         {
-            var host = await Dns.GetHostEntryAsync(uri.Host);
-            var endpoint = new IPEndPoint(host.AddressList[0], uri.Port);
-
-            socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
-            await socket.ConnectAsync(endpoint);
-
-            if (!socket.Connected) throw new Exception("Unable to establish connection with the CoAP server.");
+            client = new UdpClient(family);
         }
 
-        public void Send(byte[] data)
+        public async Task Send(Uri uri, byte[] message)
         {
-            socket.Send(data, data.Length, SocketFlags.None);
+            if (message.Length == 0) throw new ArgumentException("An empty CoAP message cannot be sent.");
+
+            client.Connect(uri.Host, uri.Port);
+            await client.SendAsync(message, message.Length);
+
+            var response = client.ReceiveAsync();
         }
+
+        //public async Task Connect(Uri uri)
+        //{
+        //    var host = await Dns.GetHostEntryAsync(uri.Host);
+        //    var endpoint = new IPEndPoint(host.AddressList[0], uri.Port);
+
+        //    socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
+        //    await socket.ConnectAsync(endpoint);
+
+        //    if (!socket.Connected) throw new Exception("Unable to establish connection with the CoAP server.");
+        //}
+
+        //public void Send(byte[] data)
+        //{
+        //    socket.Send(data, data.Length, SocketFlags.None);
+        //}
 
         public void Dispose()
         {
@@ -46,7 +61,7 @@ namespace Sockets.Coap
 
             if (disposing)
             {
-                socket?.Dispose();
+                client?.Dispose();
             }
 
             disposed = true;

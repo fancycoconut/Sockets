@@ -45,8 +45,8 @@ namespace Sockets.Example
             var data = request.Serialise();
             using (var client = new CoapUdpClient())
             {
-                await client.Connect(new Uri("coap://localhost:5683/hello"));
-                client.Send(data);
+                var uri = new Uri("coap://localhost:5683/hello");
+                await client.Send(uri, data);
             }
 
             Console.ReadLine();
