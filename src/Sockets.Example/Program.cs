@@ -1,6 +1,7 @@
 ﻿using Sockets.Coap;
 using Sockets.Core.Http;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Sockets.Example
@@ -40,8 +41,14 @@ namespace Sockets.Example
             // Test CoAP
             var request = new CoapRequest(CoapMethod.Get, CoapMessageType.Confirmable)
             {
-                Id = 23
+                Id = 23,
+                Options = new List<CoapOption>
+                {
+                    new CoapOption(Option.UriPath, "hello")
+                }
             };
+
+
             var data = request.Serialize();
             using (var client = new CoapUdpClient())
             {
