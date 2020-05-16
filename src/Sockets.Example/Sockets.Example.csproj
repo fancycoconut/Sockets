@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sockets.Coap\Sockets.Coap.csproj" />
+    <ProjectReference Include="..\Sockets.Core\Sockets.Core.csproj" />
+    <ProjectReference Include="..\Sockets.Http\Sockets.Http.csproj" />
+  </ItemGroup>
+
+</Project>
