@@ -1,4 +1,6 @@
-﻿namespace Sockets.Coap
+﻿using System.Collections.Generic;
+
+namespace Sockets.Coap
 {
     public  class CoapResponse
     {
@@ -9,5 +11,6 @@
         public CoapStatusCode StatusCode { get; set; }
 
         public byte[] Token { get; set; }
+        public IEnumerable<CoapOption> Options { get; set; }
     }
 }

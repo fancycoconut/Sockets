@@ -8,4 +8,9 @@
     <ProjectReference Include="..\Sockets.Core\Sockets.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Tcp\" />
+    <Folder Include="Udp\" />
+  </ItemGroup>
+
 </Project>

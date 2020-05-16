@@ -4,7 +4,7 @@
     {
         Empty,
         Opaque,
-        Uint,
+        UInt,
         String
     }
 }

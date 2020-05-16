@@ -32,7 +32,7 @@ namespace Sockets.Coap
             await client.SendAsync(message, message.Length);
 
             var response = await client.ReceiveAsync();
-            var reader = new CoapReader();
+            var reader = new UdpCoapReader();
             return reader.Deserialize(response.Buffer);
         }
 

@@ -1,4 +1,6 @@
-﻿using Sockets.Core.Conversion;
+﻿using Sockets.Coap.Exceptions;
+using Sockets.Core.Conversion;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Sockets.Coap
@@ -41,7 +43,7 @@ namespace Sockets.Coap
         {
             Number = number;
             RawValue = EndianBitConverter.Big.GetBytes(value);
-            ValueFormat = OptionValueFormat.Uint;
+            ValueFormat = OptionValueFormat.UInt;
         }
 
         public void SetValue(byte[] value)
@@ -58,8 +60,54 @@ namespace Sockets.Coap
 
         public void SetValue(uint value)
         {
-            ValueFormat = OptionValueFormat.Uint;
+            ValueFormat = OptionValueFormat.UInt;
             RawValue = EndianBitConverter.Big.GetBytes(value);
         }
+
+
+        public static CoapOption FromNumberValue(int number, byte[] value)
+        {
+            var optionNumber = (Option)number;
+            var validOption = optionValueFormats.TryGetValue(optionNumber, out var valueFormat);
+            if (!validOption) throw new CoapOptionException($"Cannot get option value format for the specified option number #{number}");
+
+            var option = new CoapOption(optionNumber);
+            switch (valueFormat)
+            {
+                case OptionValueFormat.Opaque:
+                    return new CoapOption(optionNumber, value);
+                case OptionValueFormat.String:
+                    var stringValue = value.Length == 0 ? string.Empty : Encoding.UTF8.GetString(value);
+                    return new CoapOption(optionNumber, stringValue);
+                case OptionValueFormat.UInt:
+                    var uintValue = value.Length == 0 ? 0 : EndianBitConverter.Big.ToUInt32(value, 0);
+                    return new CoapOption(optionNumber, uintValue);
+                case OptionValueFormat.Empty:
+                default:
+                    break;
+            }
+
+            return option;
+        }
+
+        private static readonly Dictionary<Option, OptionValueFormat> optionValueFormats = new Dictionary<Option, OptionValueFormat>
+        {
+            // As per RFC7252 section 5.10
+            { Option.IfMatch, OptionValueFormat.Opaque },
+            { Option.UriHost, OptionValueFormat.String },
+            { Option.ETag, OptionValueFormat.Opaque },
+            { Option.IfNoneMatch, OptionValueFormat.Empty },
+            { Option.UriPort, OptionValueFormat.UInt },
+            { Option.LocationPath, OptionValueFormat.String },
+            { Option.UriPath, OptionValueFormat.String },
+            { Option.ContentFormat, OptionValueFormat.UInt },
+            { Option.MaxAge, OptionValueFormat.UInt },
+            { Option.UriQuery, OptionValueFormat.String },
+            { Option.Accept, OptionValueFormat.UInt },
+            { Option.LocationQuery, OptionValueFormat.String },
+            { Option.ProxyUri, OptionValueFormat.String },
+            { Option.ProxyScheme, OptionValueFormat.String },
+            { Option.Size1, OptionValueFormat.UInt }
+        };
     }
 }

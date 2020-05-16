@@ -1,12 +1,13 @@
 ﻿using Sockets.Coap.Exceptions;
 using Sockets.Core.Conversion;
 using Sockets.Core.IO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Sockets.Coap.Serialisation
 {
-    public class CoapWriter
+    public class UdpCoapWriter
     {
         public byte[] Serialize(CoapRequest request)
         {
@@ -29,6 +30,11 @@ namespace Sockets.Coap.Serialisation
                     SerializeOptions(writer, request.Options);
 
                     // Payload
+                    if (request.Payload?.Length > 0)
+                    {
+                        writer.Write(Convert.ToByte(0xFF));
+                        writer.Write(request.Payload);
+                    }
                 }
 
                 return output.ToArray();

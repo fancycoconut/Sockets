@@ -11,6 +11,7 @@ namespace Sockets.Coap
         public CoapMethod Method { get; set; }
         public IEnumerable<CoapOption> Options { get; set; }
         public byte[] Token { get; set; }
+        public byte[] Payload { get; set; }
 
         public CoapRequest(CoapMethod method, CoapMessageType type)
         {
@@ -22,7 +23,7 @@ namespace Sockets.Coap
 
         public byte[] Serialize()
         {
-            var writer = new CoapWriter();
+            var writer = new UdpCoapWriter();
             return writer.Serialize(this);
         }
     }

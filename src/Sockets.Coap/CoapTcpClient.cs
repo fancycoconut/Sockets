@@ -7,7 +7,7 @@ namespace Sockets.Coap
     /// <summary>
     /// https://tools.ietf.org/html/rfc8323
     /// </summary>
-    class CoapTcpClient
+    public class CoapTcpClient
     {
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Sockets.Coap;
-using Sockets.Core.Http;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Sockets.Example
@@ -39,22 +39,26 @@ namespace Sockets.Example
 
 
             // Test CoAP
-            var request = new CoapRequest(CoapMethod.Get, CoapMessageType.Confirmable)
+            var request = new CoapRequest(CoapMethod.Post, CoapMessageType.Confirmable)
             {
                 Id = 23,
                 Options = new List<CoapOption>
                 {
-                    new CoapOption(Option.UriPath, "hello")
-                }
+                    new CoapOption(Option.UriPath, "storage"),
+                    new CoapOption(Option.ContentFormat, (int) MediaType.TextPlain)
+                },
+                Payload = Encoding.UTF8.GetBytes("")
             };
 
 
             var data = request.Serialize();
             using (var client = new CoapUdpClient())
             {
-                var uri = new Uri("coap://localhost:5683/hello");
+                var uri = new Uri("coap://localhost:5683");
                 var response = await client.Send(uri, data);
             }
+
+            
 
             Console.ReadLine();
         }
