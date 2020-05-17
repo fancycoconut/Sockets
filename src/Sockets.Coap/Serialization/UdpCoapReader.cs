@@ -5,10 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Sockets.Coap.Serialisation
+namespace Sockets.Coap.Serialization
 {
+    /// <summary>
+    /// https://tools.ietf.org/html/rfc7252
+    /// </summary>
     public class UdpCoapReader
     {
+        private const byte PayloadStartMarker = 0xFF;
+
         public CoapResponse Deserialize(byte[] message)
         {
             using (var input = new MemoryStream(message))
@@ -46,7 +51,8 @@ namespace Sockets.Coap.Serialisation
                         StatusCode = (CoapStatusCode) messageCode,
 
                         Token = token,
-                        Options = options
+                        Options = options,
+                        Payload = payload
                     };
                 }
             }           
@@ -60,34 +66,16 @@ namespace Sockets.Coap.Serialisation
             while (!reader.EndOfStream())
             {
                 var smallDeltaLength = reader.ReadByte();
-                if (smallDeltaLength == 0xFF) break;
+                if (smallDeltaLength == PayloadStartMarker) break;
 
                 var delta = (smallDeltaLength >> 4) & 0xF;
                 var length = smallDeltaLength & 0xF;
 
                 // Read extended delta
-                if (delta == 13)
-                {
-                    var int8Delta = reader.ReadByte();
-                    delta = int8Delta + 13;
-                }
-                else if (delta == 14)
-                {
-                    var int16Delta = reader.ReadUInt16();
-                    delta = int16Delta + 269;
-                }
+                delta = ReadExtendedIfRequired(reader, delta);
 
                 // Read extended length
-                if (length == 13)
-                {
-                    var int8Length = reader.ReadByte();
-                    length = int8Length + 13;
-                }
-                else if (length == 14)
-                {
-                    var int16Length = reader.ReadUInt16();
-                    length = int16Length + 269;
-                }
+                length = ReadExtendedIfRequired(reader, length);
 
                 var number = delta + nextOptionNumber;
                 var value = reader.ReadBytes(length);
@@ -97,6 +85,20 @@ namespace Sockets.Coap.Serialisation
             }
 
             return options;
+        }
+
+        public int ReadExtendedIfRequired(EndianBinaryReader reader, int value)
+        {
+            if (value == 13)
+            {
+                return reader.ReadByte() + 13;
+            }
+            else if (value == 14)
+            {
+                return reader.ReadUInt16() + 269;
+            }
+
+            return value;
         }
     }
 }

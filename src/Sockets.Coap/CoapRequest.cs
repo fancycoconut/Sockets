@@ -1,4 +1,4 @@
-﻿using Sockets.Coap.Serialisation;
+﻿using Sockets.Coap.Serialization;
 using System.Collections.Generic;
 
 namespace Sockets.Coap

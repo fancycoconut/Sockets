@@ -46,6 +46,8 @@ namespace Sockets.Coap
             ValueFormat = OptionValueFormat.UInt;
         }
 
+        public CoapOption(Option number, int value) : this(number, (uint)value) { }
+
         public void SetValue(byte[] value)
         {
             ValueFormat = OptionValueFormat.Opaque;
@@ -64,6 +66,10 @@ namespace Sockets.Coap
             RawValue = EndianBitConverter.Big.GetBytes(value);
         }
 
+        public void SetValue(int value)
+        {
+            SetValue((uint)value);
+        }
 
         public static CoapOption FromNumberValue(int number, byte[] value)
         {

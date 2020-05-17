@@ -2,7 +2,7 @@
 
 namespace Sockets.Coap
 {
-    public  class CoapResponse
+    public class CoapResponse
     {
         public int Id { get; set; }
         public int ProtocolVersion { get; set; }
@@ -12,5 +12,6 @@ namespace Sockets.Coap
 
         public byte[] Token { get; set; }
         public IEnumerable<CoapOption> Options { get; set; }
+        public byte[] Payload { get; set; }
     }
 }

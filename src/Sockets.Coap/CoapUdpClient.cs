@@ -1,6 +1,10 @@
-﻿using Sockets.Coap.Serialisation;
+﻿using Sockets.Coap.Serialization;
+using Sockets.Core.Conversion;
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Sockets.Coap
@@ -13,14 +17,13 @@ namespace Sockets.Coap
         private bool disposed = false;
 
         private UdpClient client;
+        private RNGCryptoServiceProvider rng;
 
-        public CoapUdpClient()
-        {
-            client = new UdpClient(AddressFamily.InterNetworkV6);
-        }
+        public CoapUdpClient() : this(AddressFamily.InterNetworkV6) { }
 
         public CoapUdpClient(AddressFamily family)
         {
+            rng = new RNGCryptoServiceProvider();
             client = new UdpClient(family);
         }
 
@@ -34,6 +37,81 @@ namespace Sockets.Coap
             var response = await client.ReceiveAsync();
             var reader = new UdpCoapReader();
             return reader.Deserialize(response.Buffer);
+        }
+
+        public Task<CoapResponse> GetConfirmable(Uri uri)
+        {
+            var token = GetRandomBytes(8);
+            return GetConfirmable(uri, token);
+        }
+
+        public Task<CoapResponse> GetConfirmable(Uri uri, byte[] token)
+        {
+            if (token.Length > 8) throw new ArgumentException("CoAP message tokens cannot exceed 8 bytes in size.");
+
+            var options = new List<CoapOption>
+            {
+                new CoapOption(Option.UriHost, uri.Host),
+                new CoapOption(Option.UriPort, uri.Port),
+                new CoapOption(Option.UriPath, uri.AbsolutePath.Replace("/", string.Empty))
+            };
+            options.AddRange(GetQueryParameterOptions(uri.Query));
+
+            var messageId = GetRandomBytes(2);
+            var request = new CoapRequest(CoapMethod.Get, CoapMessageType.Confirmable)
+            {
+                Id = EndianBitConverter.Little.ToInt16(messageId, 0),
+                Token = token,
+                Options = options
+            };
+
+            return Send(uri, request.Serialize());
+        }
+
+        public Task<CoapResponse> PostConfirmableJson(Uri uri, object payload)
+        {
+            var token = GetRandomBytes(8);
+            var jsonBytes = JsonSerializer.SerializeToUtf8Bytes(payload);
+            return PostConfirmable(uri, token, MediaType.ApplicationJson, jsonBytes);
+        }
+
+        public Task<CoapResponse> PostConfirmable(Uri uri, byte[] token, MediaType mediaType, byte[] payload)
+        {
+            var options = new List<CoapOption>
+            {
+                new CoapOption(Option.UriHost, uri.Host),
+                new CoapOption(Option.UriPort, uri.Port),
+                new CoapOption(Option.UriPath, uri.AbsolutePath.Replace("/", string.Empty)),
+                new CoapOption(Option.ContentFormat, (int) mediaType)
+            };
+            options.AddRange(GetQueryParameterOptions(uri.Query));
+
+            var messageId = GetRandomBytes(2);
+            var request = new CoapRequest(CoapMethod.Post, CoapMessageType.Confirmable)
+            {
+                Id = EndianBitConverter.Little.ToInt16(messageId, 0),
+                Token = token,
+                Options = options,
+                Payload = payload
+            };
+
+            return Send(uri, request.Serialize());
+        }
+
+        private IEnumerable<CoapOption> GetQueryParameterOptions(string query)
+        {
+            var queryParams = query.Replace("?", string.Empty).Split('&');
+            foreach (var param in queryParams)
+            {
+                yield return new CoapOption(Option.UriQuery, param);
+            }
+        }
+
+        private byte[] GetRandomBytes(int length)
+        {
+            var randomBytes = new byte[length];
+            rng.GetBytes(randomBytes);
+            return randomBytes;
         }
 
         //public async Task Connect(Uri uri)
@@ -64,6 +142,7 @@ namespace Sockets.Coap
 
             if (disposing)
             {
+                rng?.Dispose();
                 client?.Dispose();
             }
 

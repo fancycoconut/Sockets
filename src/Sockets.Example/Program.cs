@@ -47,13 +47,15 @@ namespace Sockets.Example
                     new CoapOption(Option.UriPath, "storage"),
                     new CoapOption(Option.ContentFormat, (int) MediaType.TextPlain)
                 },
-                Payload = Encoding.UTF8.GetBytes("")
+                Payload = Encoding.UTF8.GetBytes("data")
             };
 
 
             var data = request.Serialize();
             using (var client = new CoapUdpClient())
             {
+                var getResponse = await client.GetConfirmable(new Uri("coap://localhost:5683/hello"));
+
                 var uri = new Uri("coap://localhost:5683");
                 var response = await client.Send(uri, data);
             }
